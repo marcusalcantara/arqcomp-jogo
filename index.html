@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desafio de Arquitetura Computacional</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Desafio de Arquitetura Computacional</h1>
+    <p>Leia a pista e digite o termo nas casas. Depois clique em Conferir.</p>
+  </header>
+
+  <main>
+    <section id="tabuleiro" aria-label="Tabuleiro do jogo"></section>
+  </main>
+
+  <div class="painel">
+    <button id="btn-conferir" type="button">Conferir</button>
+    <button id="btn-reiniciar" type="button" class="secundario">Reiniciar</button>
+    <p id="contador" aria-live="polite">0 de 16 palavras</p>
+  </div>
+
+  <footer>
+    <p>Tópicos de Arquitetura Computacional</p>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
