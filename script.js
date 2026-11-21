@@ -17,7 +17,7 @@ const PALAVRAS = [
     pista: "Memória não volátil regravável que apaga por blocos; presente em pendrives e cartões SD." },
   { resposta: "CACHE",
     pista: "Memória pequena e muito rápida entre a CPU e a RAM que guarda cópias de dados usados com frequência." },
-  { resposta: "MEMORIADEMASSA",
+  { resposta: "ARMAZENAMENTO",
     pista: "Dispositivo de grande capacidade e não volátil, como HD ou SSD, que guarda arquivos e programas de forma permanente." },
   { resposta: "DMA",
     pista: "Mecanismo que deixa periféricos e a RAM trocarem blocos de dados sem passar pela CPU, liberando-a para outras tarefas." },
