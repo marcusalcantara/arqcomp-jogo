@@ -1,21 +1,27 @@
-# Desafio de Arquitetura Computacional
+# FREQUÊNCIA ZERO
 
-Jogo de navegador para treinar os termos da disciplina **Tópicos de Arquitetura Computacional**.
-Leia a pista, descubra o termo e digite as letras direto nas casas do tabuleiro.
+Jogo de reflexo e sintonia em HTML, CSS e JavaScript puros.
+Uma agulha varre o mostrador: pare-a dentro da faixa luminosa para decodificar cada canal.
 
 ## Como jogar
-1. Leia a pista de cada linha (o número de letras aparece ao final).
-2. Digite a resposta nas casas (maiúsculas, minúsculas e acentos são aceitos).
-3. Ao completar uma linha ela é conferida na hora: verde = certa, vermelho = tente de novo.
-4. Clique em **Conferir** para revisar todas as linhas de uma vez.
-5. Use **Dica** para revelar uma letra da linha em foco (custa 10 pontos).
-6. Acertos em sequência aumentam o **combo** e valem mais pontos. O **tempo** corre desde a primeira tecla e o **recorde** fica salvo no navegador.
-7. Ao acertar tudo você ganha um bônus e uma chuva de confetes. Clique em **Reiniciar** para uma nova rodada embaralhada.
+1. Clique em **INICIAR TRANSMISSÃO** (ou pressione **Espaço**).
+2. A agulha gira sem parar. Toque em **SINTONIZAR** / **Espaço** quando ela cruzar a faixa iluminada.
+3. O tom ambiente sobe conforme a agulha se aproxima do alvo — use o som para acertar.
+4. Acertar no centro da faixa dá **PERFEITO** e mais pontos. Acertos seguidos aumentam o **combo**.
+5. Cada erro tira 1 núcleo de integridade. Sem núcleos, o sinal é perdido.
+6. A cada 4 canais você sobe de nível: a agulha acelera, a faixa diminui e, mais adiante, o sentido de giro inverte.
+7. O **recorde** de pontos fica salvo no navegador.
+
+## Recursos
+- Mostrador desenhado em `<canvas>` com agulha, alvos, rastro, partículas e tremor de tela.
+- Áudio procedural via Web Audio API: hum guiado por proximidade, acordes de acerto, erro, nível e fim de jogo.
+- Botão para ligar/desligar o som (a preferência é salva).
+- Funciona com teclado, mouse e toque.
 
 ## Tecnologias
 HTML, CSS e JavaScript puros, sem bibliotecas.
 
 ## Estrutura
-- `index.html`: página principal
-- `style.css`: estilos
-- `script.js`: palavras, pistas e lógica do jogo
+- `index.html`: estrutura da tela e overlay de início/fim
+- `style.css`: estética neon de osciloscópio
+- `script.js`: loop do jogo, desenho no canvas e síntese de áudio
