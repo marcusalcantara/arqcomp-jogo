@@ -4,27 +4,65 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Desafio de Arquitetura Computacional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="aurora" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
   <header>
-    <h1>Desafio de Arquitetura Computacional</h1>
-    <p>Leia a pista e digite o termo nas casas. Depois clique em Conferir.</p>
+    <span class="badge">Tópicos de Arquitetura Computacional</span>
+    <h1>Desafio de <span class="destaque">Arquitetura</span> Computacional</h1>
+    <p>Leia a pista, complete as casas e descubra os termos. Acertos em sequência valem mais!</p>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">Tempo</span>
+        <span class="stat-value" id="tempo">00:00</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Pontos</span>
+        <span class="stat-value" id="pontos">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Combo</span>
+        <span class="stat-value" id="combo">x1</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Recorde</span>
+        <span class="stat-value" id="recorde">--:--</span>
+      </div>
+    </div>
   </header>
 
   <main>
+    <div class="progresso" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="16" aria-valuenow="0">
+      <div id="barra" class="progresso-barra"></div>
+    </div>
+
     <section id="tabuleiro" aria-label="Tabuleiro do jogo"></section>
   </main>
 
   <div class="painel">
     <button id="btn-conferir" type="button">Conferir</button>
+    <button id="btn-dica" type="button" class="secundario">Dica (-10)</button>
     <button id="btn-reiniciar" type="button" class="secundario">Reiniciar</button>
+    <button id="btn-som" type="button" class="icone" aria-pressed="true">Som: ligado</button>
     <p id="contador" aria-live="polite">0 de 16 palavras</p>
   </div>
 
   <footer>
     <p>Tópicos de Arquitetura Computacional</p>
   </footer>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <div id="toast" role="status" aria-live="polite"></div>
 
   <script src="script.js" defer></script>
 </body>
