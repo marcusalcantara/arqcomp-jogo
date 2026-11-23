@@ -52,9 +52,7 @@ const elIntegridade = document.getElementById("integridade");
 const elStatus = document.getElementById("status");
 const elPista = document.getElementById("pista");
 const elTamanho = document.getElementById("tamanho");
-const elBarra = document.getElementById("tempo-preenchimento");
 const elNumSinal = document.getElementById("num-sinal");
-const btnSelecionar = document.getElementById("btn-selecionar");
 const btnDica = document.getElementById("btn-dica");
 const btnSom = document.getElementById("btn-som");
 const overlay = document.getElementById("overlay");
@@ -76,8 +74,6 @@ const jogo = {
   atual: null,
   opcoes: [],
   corretaPos: 0,
-  scannerPos: 0,
-  scannerTimer: null,
   bloqueado: false,
   dicaUsada: false,
   inicio: 0,
@@ -91,10 +87,6 @@ let audioCtx = null;
 let padGain = null;
 let particulas = [];
 let animacaoConfetti = null;
-let rodadaTimer = null;
-let rodadaFim = 0;
-let rodadaDuracao = 0;
-let rodadaRestante = 0;
 
 function carregarNum(chave) {
   try {
@@ -181,7 +173,6 @@ function tomVar(freqIni, freqFim, duracao, tipo, volume, atraso) {
   osc.stop(t0 + dur + 0.03);
 }
 
-function somTick(pos) { tom(360 + pos * 90, 0.035, "square", 0.02); }
 function somClique() { tom(1250, 0.03, "square", 0.028); }
 function somHover() { tom(700, 0.025, "sine", 0.018); }
 
@@ -203,10 +194,6 @@ function somErro() {
 
 function somDica() { tomVar(420, 1100, 0.32, "sine", 0.05); }
 function somInicio() { tomVar(200, 900, 0.45, "sine", 0.055); }
-function somAlerta() {
-  tom(900, 0.05, "square", 0.04);
-  tom(900, 0.05, "square", 0.04, 0.13);
-}
 
 function somNivel() {
   [523, 659, 784, 1047].forEach(function (f, i) {
@@ -301,38 +288,22 @@ function gerarOpcoes(correto) {
 
 function renderModulos() {
   grade.innerHTML = "";
-  jogo.opcoes.forEach(function (indicePalavra) {
+  jogo.opcoes.forEach(function (indicePalavra, posicao) {
     const modulo = document.createElement("div");
     modulo.className = "modulo";
     modulo.textContent = PALAVRAS[indicePalavra].resposta;
+    modulo.setAttribute("role", "button");
+    modulo.setAttribute("tabindex", "0");
+    modulo.addEventListener("click", function () { selecionar(posicao); });
+    modulo.addEventListener("keydown", function (e) {
+      if (e.code === "Enter" || e.code === "Space") {
+        e.preventDefault();
+        selecionar(posicao);
+      }
+    });
     grade.appendChild(modulo);
   });
   jogo.corretaPos = jogo.opcoes.indexOf(jogo.atual);
-  jogo.scannerPos = Math.floor(Math.random() * grade.children.length);
-  grade.children[jogo.scannerPos].classList.add("scanner");
-}
-
-function pararScanner() {
-  if (jogo.scannerTimer) {
-    clearInterval(jogo.scannerTimer);
-    jogo.scannerTimer = null;
-  }
-}
-
-function iniciarScanner() {
-  pararScanner();
-  const intervalo = Math.max(260, 760 - (jogo.nivel - 1) * 90);
-  jogo.scannerTimer = setInterval(avancarScanner, intervalo);
-}
-
-function avancarScanner() {
-  if (!jogo.ativo || jogo.bloqueado) return;
-  const modulos = grade.children;
-  if (!modulos.length) return;
-  modulos[jogo.scannerPos].classList.remove("scanner");
-  jogo.scannerPos = (jogo.scannerPos + 1) % modulos.length;
-  modulos[jogo.scannerPos].classList.add("scanner");
-  somTick(jogo.scannerPos);
 }
 
 function mostrarGanho(elemento, texto) {
@@ -375,30 +346,28 @@ function carregarRodada() {
   renderModulos();
   atualizarHUD();
 
-  btnSelecionar.disabled = false;
   btnDica.disabled = false;
 
   if (subiuNivel) {
-    definirStatus("NÍVEL " + jogo.nivel + " — SCANNER ACELERADO", "destaque");
+    definirStatus("NÍVEL " + jogo.nivel + " — INTEGRIDADE +1", "destaque");
   } else {
-    definirStatus("SELECIONE O TERMO CORRETO", "");
+    definirStatus("CLIQUE NO TERMO CORRETO", "");
   }
-
-  iniciarRodadaTimer();
-  iniciarScanner();
 }
 
-function selecionar() {
+function selecionar(posicao) {
   if (!jogo.ativo || jogo.bloqueado) return;
 
   jogo.bloqueado = true;
-  pararScanner();
-  pausarRodadaTimer();
   somClique();
 
   const modulos = grade.children;
-  const escolhido = modulos[jogo.scannerPos];
-  const acertou = jogo.scannerPos === jogo.corretaPos;
+  const escolhido = modulos[posicao];
+  if (!escolhido) {
+    jogo.bloqueado = false;
+    return;
+  }
+  const acertou = posicao === jogo.corretaPos;
 
   if (acertou) {
     jogo.combo++;
@@ -407,7 +376,6 @@ function selecionar() {
     jogo.pontos += ganho;
     jogo.resolvidas++;
 
-    escolhido.classList.remove("scanner");
     escolhido.classList.add("certa");
     mostrarGanho(escolhido, "+" + ganho);
 
@@ -416,7 +384,6 @@ function selecionar() {
     definirStatus("MÓDULO RESTAURADO", "ok");
     atualizarHUD();
 
-    btnSelecionar.disabled = true;
     btnDica.disabled = true;
 
     setTimeout(function () {
@@ -442,8 +409,6 @@ function selecionar() {
       if (!jogo.ativo) return;
       escolhido.classList.remove("errada");
       jogo.bloqueado = false;
-      retomarRodadaTimer();
-      iniciarScanner();
     }, 560);
   }
 }
@@ -481,82 +446,6 @@ function pararTempo() {
   }
 }
 
-function iniciarRodadaTimer() {
-  pararRodadaTimer();
-  jogo.alertaTocado = false;
-  rodadaDuracao = Math.max(3200, 7000 - (jogo.nivel - 1) * 1100);
-  rodadaRestante = rodadaDuracao;
-  rodadaFim = Date.now() + rodadaDuracao;
-  elBarra.style.width = "100%";
-  elBarra.classList.remove("baixa");
-  rodadaTimer = setInterval(atualizarRodadaTimer, 80);
-}
-
-function atualizarRodadaTimer() {
-  if (!jogo.ativo) { pararRodadaTimer(); return; }
-  const restante = Math.max(0, rodadaFim - Date.now());
-  const pct = (restante / rodadaDuracao) * 100;
-  elBarra.style.width = pct + "%";
-
-  if (pct < 28) elBarra.classList.add("baixa");
-  else elBarra.classList.remove("baixa");
-
-  if (!jogo.alertaTocado && restante <= 2200 && restante > 0) {
-    jogo.alertaTocado = true;
-    somAlerta();
-  }
-
-  if (restante <= 0 && !jogo.bloqueado) tempoEsgotado();
-}
-
-function pausarRodadaTimer() {
-  if (rodadaTimer) {
-    clearInterval(rodadaTimer);
-    rodadaTimer = null;
-  }
-  rodadaRestante = Math.max(0, rodadaFim - Date.now());
-}
-
-function retomarRodadaTimer() {
-  if (!jogo.ativo) return;
-  rodadaRestante = Math.max(rodadaRestante, 900);
-  rodadaFim = Date.now() + rodadaRestante;
-  rodadaTimer = setInterval(atualizarRodadaTimer, 80);
-}
-
-function pararRodadaTimer() {
-  if (rodadaTimer) {
-    clearInterval(rodadaTimer);
-    rodadaTimer = null;
-  }
-  elBarra.style.width = "0%";
-  elBarra.classList.remove("baixa");
-}
-
-function tempoEsgotado() {
-  pararRodadaTimer();
-  pararScanner();
-  jogo.bloqueado = true;
-  jogo.combo = 0;
-  jogo.integridade--;
-
-  somErro();
-  tremerConsole();
-  atualizarHUD();
-
-  if (jogo.integridade <= 0) {
-    fimDeJogo();
-    return;
-  }
-
-  definirStatus("TEMPO ESGOTADO — SINAL PERDIDO", "ruim");
-  jogo.fila.push(jogo.atual);
-
-  setTimeout(function () {
-    if (jogo.ativo) carregarRodada();
-  }, 760);
-}
-
 function iniciarJogo() {
   if (jogo.ativo) return;
 
@@ -582,8 +471,6 @@ function iniciarJogo() {
 
   carregarRodada();
   atualizarHUD();
-
-  btnSelecionar.focus();
 }
 
 function vitoria() {
@@ -599,11 +486,9 @@ function fimDeJogo() {
 
 function finalizar(venceu) {
   jogo.ativo = false;
-  pararScanner();
   pararTempo();
   pararAmbiente();
 
-  btnSelecionar.disabled = true;
   btnDica.disabled = true;
 
   const tempoMs = Date.now() - jogo.inicio;
@@ -717,17 +602,15 @@ function pararConfetti() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-btnSelecionar.addEventListener("click", selecionar);
 btnDica.addEventListener("click", usarDica);
 btnIniciar.addEventListener("click", iniciarJogo);
 
 window.addEventListener("keydown", function (e) {
-  if (e.repeat) return;
-  if (e.code === "Space" || e.code === "Enter") {
-    if (jogo.ativo) {
-      e.preventDefault();
-      selecionar();
-    }
+  if (e.repeat || !jogo.ativo || jogo.bloqueado) return;
+  const indice = ["Digit1", "Digit2", "Digit3", "Digit4"].indexOf(e.code);
+  if (indice !== -1) {
+    e.preventDefault();
+    selecionar(indice);
   }
 });
 
@@ -744,7 +627,7 @@ btnSom.addEventListener("click", function () {
   }
 });
 
-[btnSelecionar, btnDica, btnIniciar, btnSom].forEach(function (botao) {
+[btnDica, btnIniciar, btnSom].forEach(function (botao) {
   botao.addEventListener("mouseenter", somHover);
 });
 
@@ -755,7 +638,7 @@ atualizarHUD();
 ajustarCanvas();
 mostrarOverlay(
   "NÚCLEO ZERO",
-  "Uma pista aparece no terminal e quatro módulos disputam a resposta. Um scanner salta entre eles: pressione SELECIONAR (ou Espaço) quando ele estiver no termo correto. Cada erro custa integridade.",
+  "Uma pista aparece no terminal e quatro módulos disputam a resposta. Clique no termo que corresponde à pista. Sem cronômetro: pense com calma. Cada erro custa integridade.",
   [["Recorde", jogo.recorde]],
   "INICIAR TRANSMISSÃO"
 );

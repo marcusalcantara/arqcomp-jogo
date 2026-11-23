@@ -36,7 +36,6 @@
         <span class="terminal-rotulo">SINAL RECEBIDO · <b id="num-sinal">1</b></span>
         <p class="pista" id="pista">Aguardando transmissão...</p>
         <span class="tamanho" id="tamanho"></span>
-        <div class="tempo-barra" aria-hidden="true"><span id="tempo-preenchimento"></span></div>
       </div>
 
       <div class="modulos" id="modulos-grade" aria-label="Módulos de resposta"></div>
@@ -44,13 +43,10 @@
       <p class="status-linha" id="status" aria-live="polite">Aguardando transmissão</p>
 
       <div class="acoes">
-        <button id="btn-selecionar" class="botao-principal" type="button" disabled>
-          SELECIONAR <span class="tecla">ESPAÇO</span>
-        </button>
         <button id="btn-dica" class="botao-secundario" type="button" disabled>DICA (-10)</button>
       </div>
 
-      <p class="dica-ajuda">O scanner percorre os módulos. Trave no termo que corresponde à pista. Cada salto emite um som e a velocidade aumenta a cada nível.</p>
+      <p class="dica-ajuda">Clique no módulo que corresponde à pista. Sem cronômetro: pense com calma. Cada erro custa integridade.</p>
     </section>
   </main>
 
@@ -61,7 +57,7 @@
   <div class="overlay visivel" id="overlay">
     <div class="overlay-card">
       <h2 id="overlay-titulo">NÚCLEO ZERO</h2>
-      <p id="overlay-texto">Uma pista aparece no terminal e quatro módulos disputam a resposta. Um scanner salta entre eles: pressione SELECIONAR (ou Espaço) quando ele estiver no termo correto.</p>
+      <p id="overlay-texto">Uma pista aparece no terminal e quatro módulos disputam a resposta. Clique no termo que corresponde à pista. Cada erro custa integridade.</p>
       <div class="overlay-stats" id="overlay-stats"></div>
       <button id="btn-iniciar" class="botao-principal" type="button">INICIAR TRANSMISSÃO</button>
     </div>

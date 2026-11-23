@@ -1,6 +1,6 @@
 # NÚCLEO ZERO
 
-Jogo de navegador sobre arquitetura de computadores. Uma pista aparece no terminal, quatro módulos disputam a resposta e um scanner salta entre eles. Você precisa travar o scanner no termo correto antes que o tempo acabe.
+Jogo de navegador sobre arquitetura de computadores. Uma pista aparece no terminal, quatro módulos disputam a resposta e você clica no termo que acha correto. Não há cronômetro por pergunta: pense com calma. Cada erro custa integridade.
 
 ## Estrutura
 
@@ -8,21 +8,21 @@ Jogo de navegador sobre arquitetura de computadores. Uma pista aparece no termin
 |---|---|
 | `index.html` | Estrutura da página: HUD, terminal, grade de módulos, botões, tela inicial/final e canvas do confete. |
 | `style.css` | Visual neon escuro, animações, layout responsivo (breakpoint em 520 px) e suporte a `prefers-reduced-motion`. |
-| `script.js` | Lógica do jogo, som (Web Audio API), timers, pontuação e confete. |
+| `script.js` | Lógica do jogo, som (Web Audio API), pontuação e confete. |
 
 ## Como jogar
 
 1. Clique em **INICIAR TRANSMISSÃO**.
 2. Leia a pista no terminal. O número de letras do termo aparece abaixo dela.
-3. Quatro módulos mostram as opções de resposta. O scanner percorre os módulos em ciclo.
-4. Pressione **SELECIONAR** (ou **Espaço** / **Enter**) quando o scanner estiver no termo correto.
-5. Se travar, use **DICA (-10)** para destacar a resposta certa por 1,6 s. Há uma dica por rodada.
+3. Quatro módulos mostram as opções de resposta.
+4. Clique no módulo que você acha correto (ou use as teclas `1`–`4`). Não há limite de tempo por pergunta.
+5. Se quiser ajuda, use **DICA (-10)** para destacar a resposta certa por 1,6 s. Há uma dica por rodada.
 
 ### Controles
 
 | Ação | Teclado | Mouse/toque |
 |---|---|---|
-| Selecionar módulo | `Espaço` ou `Enter` | Botão SELECIONAR |
+| Responder | `1`, `2`, `3` ou `4` | Clique no módulo |
 | Dica | n/a | Botão DICA (-10) |
 | Ligar/desligar som | n/a | Botão SOM no canto superior direito |
 
@@ -30,9 +30,8 @@ Jogo de navegador sobre arquitetura de computadores. Uma pista aparece no termin
 
 - **Objetivo:** restaurar os 16 módulos (um por termo) antes que a integridade chegue a zero.
 - **Integridade:** começa em 3 núcleos e vai até no máximo 5.
-- **Erro:** custa 1 de integridade e zera o combo. A mesma pista continua, e o tempo restante é retomado (com pelo menos 0,9 s).
-- **Tempo esgotado:** custa 1 de integridade, zera o combo e o termo volta para o fim da fila.
-- **Níveis:** o nível sobe a cada 4 módulos restaurados. Cada novo nível dá +1 de integridade (até o máximo), acelera o scanner e reduz o tempo da rodada.
+- **Erro:** custa 1 de integridade e zera o combo. A mesma pista continua e você pode tentar de novo.
+- **Níveis:** o nível sobe a cada 4 módulos restaurados. Cada novo nível dá +1 de integridade (até o máximo).
 - **Fim de jogo:** vitória ao restaurar os 16 módulos; derrota quando a integridade chega a 0.
 
 ### Pontuação
@@ -44,10 +43,11 @@ Jogo de navegador sobre arquitetura de computadores. Uma pista aparece no termin
 
 ### Dificuldade por nível
 
-| Parâmetro | Fórmula | Limite |
-|---|---|---|
-| Intervalo do scanner | `760 − (nível − 1) × 90` ms | mínimo 260 ms |
-| Tempo da rodada | `7000 − (nível − 1) × 1100` ms | mínimo 3200 ms |
+| Parâmetro | Fórmula |
+|---|---|
+| Integridade bônus | +1 a cada nível (até 5) |
+
+Não há mais cronômetro nem velocidade de scanner: o ritmo é definido pelo jogador.
 
 ## Os 16 termos
 
@@ -81,5 +81,5 @@ Jogo de navegador sobre arquitetura de computadores. Uma pista aparece no termin
 
 - Os módulos errados são sorteados entre todos os 16 termos, sem considerar a categoria.
 - Depois de um erro, a mesma pista continua e a resposta certa não é revelada.
-- Não há pausa, e o jogo continua correndo se você trocar de aba.
+- Não há pausa; o cronômetro total continua correndo se você trocar de aba.
 - O resumo final não lista os termos que você errou.
