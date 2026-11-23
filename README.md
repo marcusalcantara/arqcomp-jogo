@@ -1,27 +1,94 @@
-# FREQUÊNCIA ZERO
+# NÚCLEO ZERO
 
-Jogo de reflexo e sintonia em HTML, CSS e JavaScript puros.
-Uma agulha varre o mostrador: pare-a dentro da faixa luminosa para decodificar cada canal.
+Jogo de navegador sobre arquitetura de computadores. Uma pista aparece no terminal, quatro módulos disputam a resposta e um scanner salta entre eles. Você precisa travar o scanner no termo correto antes que o tempo acabe.
 
-## Como jogar
-1. Clique em **INICIAR TRANSMISSÃO** (ou pressione **Espaço**).
-2. A agulha gira sem parar. Toque em **SINTONIZAR** / **Espaço** quando ela cruzar a faixa iluminada.
-3. O tom ambiente sobe conforme a agulha se aproxima do alvo — use o som para acertar.
-4. Acertar no centro da faixa dá **PERFEITO** e mais pontos. Acertos seguidos aumentam o **combo**.
-5. Cada erro tira 1 núcleo de integridade. Sem núcleos, o sinal é perdido.
-6. A cada 4 canais você sobe de nível: a agulha acelera, a faixa diminui e, mais adiante, o sentido de giro inverte.
-7. O **recorde** de pontos fica salvo no navegador.
+Esta é a **versão original** do projeto, dividida em três arquivos.
 
-## Recursos
-- Mostrador desenhado em `<canvas>` com agulha, alvos, rastro, partículas e tremor de tela.
-- Áudio procedural via Web Audio API: hum guiado por proximidade, acordes de acerto, erro, nível e fim de jogo.
-- Botão para ligar/desligar o som (a preferência é salva).
-- Funciona com teclado, mouse e toque.
+## Como rodar
 
-## Tecnologias
-HTML, CSS e JavaScript puros, sem bibliotecas.
+1. Deixe os três arquivos na mesma pasta: `index.html`, `style.css` e `script.js`.
+2. Abra o `index.html` em qualquer navegador moderno.
+
+Não há dependências nem build. As fontes **Orbitron** e **Space Grotesk** vêm do Google Fonts. Sem internet, o jogo usa as fontes de sistema como alternativa.
 
 ## Estrutura
-- `index.html`: estrutura da tela e overlay de início/fim
-- `style.css`: estética neon de osciloscópio
-- `script.js`: loop do jogo, desenho no canvas e síntese de áudio
+
+| Arquivo | Função |
+|---|---|
+| `index.html` | Estrutura da página: HUD, terminal, grade de módulos, botões, tela inicial/final e canvas do confete. |
+| `style.css` | Visual neon escuro, animações, layout responsivo (breakpoint em 520 px) e suporte a `prefers-reduced-motion`. |
+| `script.js` | Lógica do jogo, som (Web Audio API), timers, pontuação e confete. |
+
+## Como jogar
+
+1. Clique em **INICIAR TRANSMISSÃO**.
+2. Leia a pista no terminal. O número de letras do termo aparece abaixo dela.
+3. Quatro módulos mostram as opções de resposta. O scanner percorre os módulos em ciclo.
+4. Pressione **SELECIONAR** (ou **Espaço** / **Enter**) quando o scanner estiver no termo correto.
+5. Se travar, use **DICA (-10)** para destacar a resposta certa por 1,6 s. Há uma dica por rodada.
+
+### Controles
+
+| Ação | Teclado | Mouse/toque |
+|---|---|---|
+| Selecionar módulo | `Espaço` ou `Enter` | Botão SELECIONAR |
+| Dica | n/a | Botão DICA (-10) |
+| Ligar/desligar som | n/a | Botão SOM no canto superior direito |
+
+## Regras
+
+- **Objetivo:** restaurar os 16 módulos (um por termo) antes que a integridade chegue a zero.
+- **Integridade:** começa em 3 núcleos e vai até no máximo 5.
+- **Erro:** custa 1 de integridade e zera o combo. A mesma pista continua, e o tempo restante é retomado (com pelo menos 0,9 s).
+- **Tempo esgotado:** custa 1 de integridade, zera o combo e o termo volta para o fim da fila.
+- **Níveis:** o nível sobe a cada 4 módulos restaurados. Cada novo nível dá +1 de integridade (até o máximo), acelera o scanner e reduz o tempo da rodada.
+- **Fim de jogo:** vitória ao restaurar os 16 módulos; derrota quando a integridade chega a 0.
+
+### Pontuação
+
+- Acerto: `100 × multiplicador`, em que `multiplicador = min(1 + combo × 0,2; 5)`. O combo já conta o acerto atual, então o primeiro acerto da sequência vale 120.
+- Dica: −10 pontos.
+- Vitória: +500 de bônus.
+- O **recorde** é salvo no `localStorage` do navegador.
+
+### Dificuldade por nível
+
+| Parâmetro | Fórmula | Limite |
+|---|---|---|
+| Intervalo do scanner | `760 − (nível − 1) × 90` ms | mínimo 260 ms |
+| Tempo da rodada | `7000 − (nível − 1) × 1100` ms | mínimo 3200 ms |
+
+## Os 16 termos
+
+| Termo | Assunto |
+|---|---|
+| CPU | Processador, o "cérebro" do computador |
+| ULA | Unidade que faz contas e operações lógicas |
+| UC | Unidade de controle, que interpreta instruções |
+| REGISTRADORES | Memórias mais rápidas, dentro da CPU |
+| RAM | Memória volátil principal |
+| ROM | Memória não volátil gravada na fabricação |
+| EEPROM | Não volátil, regravável byte a byte |
+| FLASH | Não volátil, apaga por blocos (pendrives, cartões SD) |
+| CACHE | Memória pequena e rápida entre CPU e RAM |
+| ARMAZENAMENTO | HD/SSD, guarda dados de forma permanente |
+| DMA | Acesso direto à memória, sem passar pela CPU |
+| ADDRESSBUS | Barramento de endereços, sentido único |
+| DATABUS | Barramento de dados, bidirecional |
+| MICROCONTROLADOR | Chip único com processador, memória e E/S |
+| DUALCORE | Processador de dois núcleos |
+| QUADCORE | Processador de quatro núcleos |
+
+## Personalização
+
+- **Termos e pistas:** edite o array `PALAVRAS` no início de `script.js`. Cada item tem `resposta` e `pista`. Se mudar a quantidade de termos, ajuste também os textos fixos "16" e "0/16" no `index.html` e em `script.js` (mensagens finais).
+- **Balanceamento:** as constantes no topo do `script.js` controlam o jogo: `INTEGRIDADE_INICIAL`, `MAX_INTEGRIDADE`, `MODULOS_POR_NIVEL`, `BONUS_VITORIA` e `CUSTO_DICA`.
+- **Cores:** variáveis CSS em `:root` no `style.css` (`--verde`, `--ciano`, `--magenta`, `--amarelo`).
+- **Armazenamento local:** chaves `nucleozero_recorde` e `nucleozero_som`.
+
+## Limitações conhecidas da versão original
+
+- Os módulos errados são sorteados entre todos os 16 termos, sem considerar a categoria.
+- Depois de um erro, a mesma pista continua e a resposta certa não é revelada.
+- Não há pausa, e o jogo continua correndo se você trocar de aba.
+- O resumo final não lista os termos que você errou.
