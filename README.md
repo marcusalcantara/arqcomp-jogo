@@ -1,85 +1,79 @@
-# NÚCLEO ZERO
+# NÚCLEO FC — Jogo da Memória
 
-Jogo de navegador sobre arquitetura de computadores. Uma pista aparece no terminal, quatro módulos disputam a resposta e você clica no termo que acha correto. Não há cronômetro por pergunta: pense com calma. Cada erro custa integridade.
+Jogo de navegador para estudar arquitetura de computadores em clima de futebol. Dois bonequinhos — **VOCÊ** e **BUG** — comentam a partida enquanto você joga um **jogo da memória** no campo.
+
+Cada um dos **16 termos** tem a sua **pista**. Vire duas cartas por vez e encontre os pares (termo + pista). Cada par certo vale um gol. O conteúdo aparece como cartas, sem quiz de alternativas, e há um **Modo Estudo** com todos os termos e pistas.
 
 ## Estrutura
 
 | Arquivo | Função |
 |---|---|
-| `index.html` | Estrutura da página: HUD, terminal, grade de módulos, botões, tela inicial/final e canvas do confete. |
-| `style.css` | Visual neon escuro, animações, layout responsivo (breakpoint em 520 px) e suporte a `prefers-reduced-motion`. |
-| `script.js` | Lógica do jogo, som (Web Audio API), pontuação e confete. |
+| `index.html` | Estrutura da página: placar, campo com tabuleiro, bonequinhos, painel, tela inicial/final e modo estudo. |
+| `style.css` | Visual neon de estádio, cartas com giro 3D, animações dos bonequinhos, layout responsivo e suporte a `prefers-reduced-motion`. |
+| `script.js` | Lógica do jogo da memória, 16 pares, rodadas, timer, som (Web Audio API) e modo estudo. |
 
 ## Como jogar
 
-1. Clique em **INICIAR TRANSMISSÃO**.
-2. Leia a pista no terminal. O número de letras do termo aparece abaixo dela.
-3. Quatro módulos mostram as opções de resposta.
-4. Clique no módulo que você acha correto (ou use as teclas `1`–`4`). Não há limite de tempo por pergunta.
-5. Se quiser ajuda, use **DICA (-10)** para destacar a resposta certa por 1,6 s. Há uma dica por rodada.
+1. Clique em **INICIAR DUELO**.
+2. O tabuleiro mostra 8 cartas por rodada: 4 termos e 4 pistas, embaralhados.
+3. Vire duas cartas por vez clicando nelas (ou usando `Enter`/`Espaço` com o teclado).
+4. Se o termo combinar com a pista, o par fica aberto e você marca um gol. Se não, as cartas se fecham e conta um erro.
+5. Encontre os 4 pares da rodada para avançar. São 4 rodadas, totalizando os 16 pares.
 
 ### Controles
 
 | Ação | Teclado | Mouse/toque |
 |---|---|---|
-| Responder | `1`, `2`, `3` ou `4` | Clique no módulo |
-| Dica | n/a | Botão DICA (-10) |
-| Ligar/desligar som | n/a | Botão SOM no canto superior direito |
+| Virar carta | `Enter` ou `Espaço` na carta focada | Clique na carta |
+| Abrir/fechar modo estudo | `Esc` fecha | Botões **MODO ESTUDO** |
+| Ligar/desligar som | n/a | Botão **SOM** |
+| Reiniciar partida | n/a | Botão **REINICIAR** |
 
-## Regras
+## Regras e pontuação
 
-- **Objetivo:** restaurar os 16 módulos (um por termo) antes que a integridade chegue a zero.
-- **Integridade:** começa em 3 núcleos e vai até no máximo 5.
-- **Erro:** custa 1 de integridade e zera o combo. A mesma pista continua e você pode tentar de novo.
-- **Níveis:** o nível sobe a cada 4 módulos restaurados. Cada novo nível dá +1 de integridade (até o máximo).
-- **Fim de jogo:** vitória ao restaurar os 16 módulos; derrota quando a integridade chega a 0.
+- **Objetivo:** encontrar os 16 pares de termo + pista.
+- **Acerto:** o par fica revelado, conta um gol e aumenta a sequência.
+- **Erro:** as cartas se fecham, a sequência zera e o contador de erros sobe.
+- **Rodadas:** 4 rodadas de 4 pares.
+- **Resultado:** quanto menos erros, melhor. Até 4 erros = vitória; até 10 = bom jogo; acima disso = treine mais.
+- **Recorde:** a menor quantidade de erros (e o tempo de desempate) fica salva no `localStorage`.
+- **Tempo:** o cronômetro total aparece no painel, mas não limita a partida.
 
-### Pontuação
+## Modo Estudo
 
-- Acerto: `100 × multiplicador`, em que `multiplicador = min(1 + combo × 0,2; 5)`. O combo já conta o acerto atual, então o primeiro acerto da sequência vale 120.
-- Dica: −10 pontos.
-- Vitória: +500 de bônus.
-- O **recorde** é salvo no `localStorage` do navegador.
-
-### Dificuldade por nível
-
-| Parâmetro | Fórmula |
-|---|---|
-| Integridade bônus | +1 a cada nível (até 5) |
-
-Não há mais cronômetro nem velocidade de scanner: o ritmo é definido pelo jogador.
+O botão **MODO ESTUDO** abre uma lista com todos os 16 termos, suas pistas e uma busca por palavra. É o material de revisão do conteúdo, disponível antes, durante e depois da partida. No fim do jogo, o botão **REVISAR CONTEÚDO** abre a mesma lista.
 
 ## Os 16 termos
 
-| Termo | Assunto |
+| Termo | Pista |
 |---|---|
-| CPU | Processador, o "cérebro" do computador |
-| ULA | Unidade que faz contas e operações lógicas |
-| UC | Unidade de controle, que interpreta instruções |
-| REGISTRADORES | Memórias mais rápidas, dentro da CPU |
-| RAM | Memória volátil principal |
+| CPU | Chip que executa as instruções dos programas; é o "cérebro" do computador |
+| ULA | Parte da CPU que faz as contas e as operações lógicas |
+| UC | Parte da CPU que interpreta as instruções e coordena os demais componentes |
+| REGISTRADORES | Pequenas memórias dentro da CPU, as mais rápidas de todas |
+| RAM | Memória volátil principal onde ficam programas e dados em uso |
 | ROM | Memória não volátil gravada na fabricação |
-| EEPROM | Não volátil, regravável byte a byte |
-| FLASH | Não volátil, apaga por blocos (pendrives, cartões SD) |
-| CACHE | Memória pequena e rápida entre CPU e RAM |
-| ARMAZENAMENTO | HD/SSD, guarda dados de forma permanente |
-| DMA | Acesso direto à memória, sem passar pela CPU |
-| ADDRESSBUS | Barramento de endereços, sentido único |
-| DATABUS | Barramento de dados, bidirecional |
-| MICROCONTROLADOR | Chip único com processador, memória e E/S |
-| DUALCORE | Processador de dois núcleos |
-| QUADCORE | Processador de quatro núcleos |
+| EEPROM | Memória não volátil regravável byte a byte |
+| FLASH | Memória não volátil regravável que apaga por blocos |
+| CACHE | Memória pequena e rápida entre a CPU e a RAM |
+| ARMAZENAMENTO | HD/SSD, grande capacidade e não volátil |
+| DMA | Periféricos e RAM trocam dados sem passar pela CPU |
+| ADDRESSBUS | Linhas de sentido único que indicam a posição de memória |
+| DATABUS | Linhas bidirecionais que transportam os valores lidos/escritos |
+| MICROCONTROLADOR | Chip único com processador, memória e E/S para tarefas dedicadas |
+| DUALCORE | Processador com dois núcleos de execução no mesmo chip |
+| QUADCORE | Processador com quatro núcleos no mesmo chip |
 
 ## Personalização
 
-- **Termos e pistas:** edite o array `PALAVRAS` no início de `script.js`. Cada item tem `resposta` e `pista`. Se mudar a quantidade de termos, ajuste também os textos fixos "16" e "0/16" no `index.html` e em `script.js` (mensagens finais).
-- **Balanceamento:** as constantes no topo do `script.js` controlam o jogo: `INTEGRIDADE_INICIAL`, `MAX_INTEGRIDADE`, `MODULOS_POR_NIVEL`, `BONUS_VITORIA` e `CUSTO_DICA`.
+- **Termos e pistas:** edite o array `PALAVRAS` no início de `script.js`. Cada item tem `resposta` e `pista`. A quantidade de rodadas se ajusta automaticamente.
+- **Pares por rodada:** ajuste a constante `PARES_POR_RODADA`.
+- **Falas dos bonequinhos:** edite `FALAS_RIVAL` e `FALAS_VOCE` em `script.js`.
 - **Cores:** variáveis CSS em `:root` no `style.css` (`--verde`, `--ciano`, `--magenta`, `--amarelo`).
-- **Armazenamento local:** chaves `nucleozero_recorde` e `nucleozero_som`.
+- **Armazenamento local:** chaves `nucleofc_memoria_erros`, `nucleofc_memoria_tempo` e `nucleofc_som`.
 
-## Limitações conhecidas da versão original
+## Observações
 
-- Os módulos errados são sorteados entre todos os 16 termos, sem considerar a categoria.
-- Depois de um erro, a mesma pista continua e a resposta certa não é revelada.
-- Não há pausa; o cronômetro total continua correndo se você trocar de aba.
-- O resumo final não lista os termos que você errou.
+- As cartas de pista mostram o texto completo da pista; as de termo mostram o nome do componente.
+- Não há cronômetro eliminatório: o tempo é apenas informativo.
+- O som usa a Web Audio API e é ativado no primeiro clique.

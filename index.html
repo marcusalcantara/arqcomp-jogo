@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NÚCLEO ZERO</title>
+  <title>NÚCLEO ZERO — Jogo da Memória</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -17,53 +17,100 @@
       <span class="logo-dot" aria-hidden="true"></span>
       <h1>NÚCLEO <span>ZERO</span></h1>
     </div>
-    <p class="tagline">Decodifique os módulos. Restaure o núcleo.</p>
+    <p class="tagline">Jogo da memória · arquitetura de computadores</p>
   </header>
 
   <main class="palco">
-    <section class="hud" aria-label="Status do jogo">
-      <div class="hud-item"><span>Módulos</span><strong id="modulos">0/16</strong></div>
-      <div class="hud-item"><span>Pontos</span><strong id="pontos">0</strong></div>
-      <div class="hud-item"><span>Combo</span><strong id="combo">x1</strong></div>
-      <div class="hud-item"><span>Tempo</span><strong id="tempo">00:00</strong></div>
-      <div class="hud-item"><span>Recorde</span><strong id="recorde">0</strong></div>
+    <section class="placar" aria-label="Placar do jogo">
+      <div class="placar-lado placar-voce">
+        <span class="nome">PARES</span>
+        <strong id="pares">0/16</strong>
+      </div>
+      <div class="placar-meio">
+        <span class="rodada" id="rodada">RODADA 1/4</span>
+        <span class="combo" id="combo">SEQUÊNCIA x0</span>
+      </div>
+      <div class="placar-lado placar-rival">
+        <strong id="erros">0</strong>
+        <span class="nome">ERROS</span>
+      </div>
     </section>
 
-    <section class="console" id="console" aria-label="Console de decodificação">
-      <div class="integridade" id="integridade" aria-label="Integridade do núcleo"></div>
-
-      <div class="terminal">
-        <span class="terminal-rotulo">SINAL RECEBIDO · <b id="num-sinal">1</b></span>
-        <p class="pista" id="pista">Aguardando transmissão...</p>
-        <span class="tamanho" id="tamanho"></span>
+    <section class="mesa" id="mesa" aria-label="Tabuleiro de cartas">
+      <div class="comentarios">
+        <div class="comentarista">
+          <div class="fala fala-voce" id="fala-voce">Bora!</div>
+          <div class="boneco-mini voce" aria-hidden="true">
+            <svg class="boneco-svg" viewBox="0 0 60 100">
+              <circle cx="30" cy="16" r="11"></circle>
+              <line x1="30" y1="27" x2="30" y2="60"></line>
+              <line x1="30" y1="38" x2="10" y2="52"></line>
+              <line x1="30" y1="38" x2="50" y2="52"></line>
+              <line x1="30" y1="60" x2="14" y2="94"></line>
+              <line x1="30" y1="60" x2="46" y2="94"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="comentarista rival">
+          <div class="boneco-mini rival" aria-hidden="true">
+            <svg class="boneco-svg" viewBox="0 0 60 100">
+              <circle cx="30" cy="16" r="11"></circle>
+              <line x1="30" y1="27" x2="30" y2="60"></line>
+              <line x1="30" y1="38" x2="10" y2="52"></line>
+              <line x1="30" y1="38" x2="50" y2="52"></line>
+              <line x1="30" y1="60" x2="14" y2="94"></line>
+              <line x1="30" y1="60" x2="46" y2="94"></line>
+            </svg>
+          </div>
+          <div class="fala fala-rival" id="fala-rival">Você não sabe nada!</div>
+        </div>
       </div>
 
-      <div class="modulos" id="modulos-grade" aria-label="Módulos de resposta"></div>
+      <div class="tabuleiro" id="tabuleiro" aria-label="Cartas do jogo da memória"></div>
 
-      <p class="status-linha" id="status" aria-live="polite">Aguardando transmissão</p>
+      <div class="acerto-flash" id="acerto-flash" aria-hidden="true">ACERTOU!</div>
 
+      <p class="narracao" id="narracao" aria-live="polite">Toque em INICIAR JOGO para começar.</p>
+    </section>
+
+    <section class="painel">
+      <div class="painel-topo">
+        <p class="instrucao">Vire duas cartas por vez. Cada termo combina com a sua pista — encontre os 4 pares da rodada.</p>
+        <span class="relogio">TEMPO <b id="tempo">00:00</b></span>
+      </div>
       <div class="acoes">
-        <button id="btn-dica" class="botao-secundario" type="button" disabled>DICA (-10)</button>
+        <button id="btn-estudo" class="botao-secundario" type="button">MODO ESTUDO</button>
+        <button id="btn-som" class="botao-secundario" type="button" aria-pressed="true">SOM: LIGADO</button>
+        <button id="btn-reiniciar" class="botao-secundario" type="button">REINICIAR</button>
       </div>
-
-      <p class="dica-ajuda">Clique no módulo que corresponde à pista. Sem cronômetro: pense com calma. Cada erro custa integridade.</p>
     </section>
   </main>
 
-  <footer class="rodape">DECODIFIQUE · CONECTE · SOBREVIVA</footer>
-
-  <button id="btn-som" class="botao-som" type="button" aria-pressed="true">SOM: LIGADO</button>
+  <footer class="rodape">ESTUDE · MEMORIZE · CONECTE</footer>
 
   <div class="overlay visivel" id="overlay">
     <div class="overlay-card">
       <h2 id="overlay-titulo">NÚCLEO ZERO</h2>
-      <p id="overlay-texto">Uma pista aparece no terminal e quatro módulos disputam a resposta. Clique no termo que corresponde à pista. Cada erro custa integridade.</p>
+      <p id="overlay-texto">Um jogo da memória com o conteúdo de arquitetura de computadores: cada termo tem a sua pista. Vire duas cartas por vez e encontre os pares. São 16 pares em 4 rodadas.</p>
       <div class="overlay-stats" id="overlay-stats"></div>
-      <button id="btn-iniciar" class="botao-principal" type="button">INICIAR TRANSMISSÃO</button>
+      <div class="overlay-botoes">
+        <button id="btn-iniciar" class="botao-principal" type="button">INICIAR JOGO</button>
+        <button id="btn-estudo-overlay" class="botao-secundario" type="button">ESTUDAR PRIMEIRO</button>
+      </div>
     </div>
   </div>
 
-  <canvas id="confetti" aria-hidden="true"></canvas>
+  <div class="modal" id="modal-estudo" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="estudo-titulo">
+      <div class="modal-topo">
+        <h2 id="estudo-titulo">MODO ESTUDO</h2>
+        <button id="btn-fechar-estudo" class="botao-fechar" type="button" aria-label="Fechar modo estudo">×</button>
+      </div>
+      <p class="modal-sub">Os 16 termos de arquitetura de computadores. Leia a pista e a resposta antes de começar.</p>
+      <input id="busca-estudo" type="search" placeholder="Buscar termo ou palavra da pista...">
+      <div class="estudo-lista" id="estudo-lista"></div>
+    </div>
+  </div>
 
   <script src="script.js" defer></script>
 </body>

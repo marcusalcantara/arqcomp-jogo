@@ -1,98 +1,73 @@
 const PALAVRAS = [
-  { resposta: "CPU",
-    pista: "Chip que executa as instruções dos programas; é o \"cérebro\" do computador." },
-  { resposta: "ULA",
-    pista: "Parte da CPU que faz as contas e as operações lógicas." },
-  { resposta: "UC",
-    pista: "Parte da CPU que interpreta as instruções e coordena o trabalho dos demais componentes." },
-  { resposta: "REGISTRADORES",
-    pista: "Pequenas memórias dentro da CPU, as mais rápidas de todas, que guardam os dados em uso imediato." },
-  { resposta: "RAM",
-    pista: "Memória volátil principal onde ficam programas e dados em uso; perde tudo ao desligar." },
-  { resposta: "ROM",
-    pista: "Memória não volátil gravada na fabricação, cujo conteúdo em geral não é alterado pelo usuário." },
-  { resposta: "EEPROM",
-    pista: "Memória não volátil regravável que permite apagar e escrever byte a byte, usada para guardar configurações pequenas." },
-  { resposta: "FLASH",
-    pista: "Memória não volátil regravável que apaga por blocos; presente em pendrives e cartões SD." },
-  { resposta: "CACHE",
-    pista: "Memória pequena e muito rápida entre a CPU e a RAM que guarda cópias de dados usados com frequência." },
-  { resposta: "ARMAZENAMENTO",
-    pista: "Dispositivo de grande capacidade e não volátil, como HD ou SSD, que guarda arquivos e programas de forma permanente." },
-  { resposta: "DMA",
-    pista: "Mecanismo que deixa periféricos e a RAM trocarem blocos de dados sem passar pela CPU, liberando-a para outras tarefas." },
-  { resposta: "ADDRESSBUS",
-    pista: "Conjunto de linhas, de sentido único, pelo qual a CPU indica a posição de memória que quer acessar." },
-  { resposta: "DATABUS",
-    pista: "Conjunto de linhas bidirecional que transporta os valores lidos ou escritos entre CPU, memória e periféricos." },
-  { resposta: "MICROCONTROLADOR",
-    pista: "Circuito integrado único com processador, memória e entradas/saídas, feito para tarefas dedicadas em sistemas embarcados." },
-  { resposta: "DUALCORE",
-    pista: "Processador com dois núcleos de execução no mesmo chip." },
-  { resposta: "QUADCORE",
-    pista: "Processador com quatro núcleos de execução no mesmo chip, capaz de executar tarefas em paralelo." }
+  { resposta: "CPU", pista: "Chip que executa as instruções dos programas; é o \"cérebro\" do computador." },
+  { resposta: "ULA", pista: "Parte da CPU que faz as contas e as operações lógicas." },
+  { resposta: "UC", pista: "Parte da CPU que interpreta as instruções e coordena o trabalho dos demais componentes." },
+  { resposta: "REGISTRADORES", pista: "Pequenas memórias dentro da CPU, as mais rápidas de todas, que guardam os dados em uso imediato." },
+  { resposta: "RAM", pista: "Memória volátil principal onde ficam programas e dados em uso; perde tudo ao desligar." },
+  { resposta: "ROM", pista: "Memória não volátil gravada na fabricação, cujo conteúdo em geral não é alterado pelo usuário." },
+  { resposta: "EEPROM", pista: "Memória não volátil regravável que permite apagar e escrever byte a byte, usada para guardar configurações pequenas." },
+  { resposta: "FLASH", pista: "Memória não volátil regravável que apaga por blocos; presente em pendrives e cartões SD." },
+  { resposta: "CACHE", pista: "Memória pequena e muito rápida entre a CPU e a RAM que guarda cópias de dados usados com frequência." },
+  { resposta: "ARMAZENAMENTO", pista: "Dispositivo de grande capacidade e não volátil, como HD ou SSD, que guarda arquivos e programas de forma permanente." },
+  { resposta: "DMA", pista: "Mecanismo que deixa periféricos e a RAM trocarem blocos de dados sem passar pela CPU, liberando-a para outras tarefas." },
+  { resposta: "ADDRESSBUS", pista: "Conjunto de linhas, de sentido único, pelo qual a CPU indica a posição de memória que quer acessar." },
+  { resposta: "DATABUS", pista: "Conjunto de linhas bidirecional que transporta os valores lidos ou escritos entre CPU, memória e periféricos." },
+  { resposta: "MICROCONTROLADOR", pista: "Circuito integrado único com processador, memória e entradas/saídas, feito para tarefas dedicadas em sistemas embarcados." },
+  { resposta: "DUALCORE", pista: "Processador com dois núcleos de execução no mesmo chip." },
+  { resposta: "QUADCORE", pista: "Processador com quatro núcleos de execução no mesmo chip, capaz de executar tarefas em paralelo." }
 ];
 
-const CHAVE_RECORDE = "nucleozero_recorde";
+const CHAVE_RECORDE_ERROS = "nucleozero_memoria_erros";
+const CHAVE_RECORDE_TEMPO = "nucleozero_memoria_tempo";
 const CHAVE_SOM = "nucleozero_som";
-const MAX_INTEGRIDADE = 5;
-const INTEGRIDADE_INICIAL = 3;
-const MODULOS_POR_NIVEL = 4;
-const BONUS_VITORIA = 500;
-const CUSTO_DICA = 10;
+const TOTAL = PALAVRAS.length;
+const PARES_POR_RODADA = 4;
+const RODADAS = Math.ceil(TOTAL / PARES_POR_RODADA);
 
-const grade = document.getElementById("modulos-grade");
-const consoleEl = document.getElementById("console");
-const elModulos = document.getElementById("modulos");
-const elPontos = document.getElementById("pontos");
-const elCombo = document.getElementById("combo");
-const elTempo = document.getElementById("tempo");
-const elRecorde = document.getElementById("recorde");
-const elIntegridade = document.getElementById("integridade");
-const elStatus = document.getElementById("status");
-const elPista = document.getElementById("pista");
-const elTamanho = document.getElementById("tamanho");
-const elNumSinal = document.getElementById("num-sinal");
-const btnDica = document.getElementById("btn-dica");
-const btnSom = document.getElementById("btn-som");
-const overlay = document.getElementById("overlay");
-const overlayTitulo = document.getElementById("overlay-titulo");
-const overlayTexto = document.getElementById("overlay-texto");
-const overlayStats = document.getElementById("overlay-stats");
-const btnIniciar = document.getElementById("btn-iniciar");
-const canvas = document.getElementById("confetti");
-const ctx = canvas.getContext("2d");
-
-const jogo = {
-  ativo: false,
-  pontos: 0,
-  combo: 0,
-  integridade: INTEGRIDADE_INICIAL,
-  nivel: 1,
-  resolvidas: 0,
-  fila: [],
-  atual: null,
-  opcoes: [],
-  corretaPos: 0,
-  bloqueado: false,
-  dicaUsada: false,
-  inicio: 0,
-  tempoTimer: null,
-  recorde: carregarNum(CHAVE_RECORDE),
-  novoRecorde: false,
-  som: carregarSom()
+const FALAS_RIVAL = {
+  provocar: [
+    "Aposto que você não lembra de nada!",
+    "Vira essa carta, vai!",
+    "Estudou mesmo ou vai arriscar?",
+    "Essa pista é fácil... pro meu nível.",
+    "Cadê essa memória toda?",
+    "Vou achar esse par primeiro."
+  ],
+  falha: [
+    "Errou! Esse par é meu!",
+    "Valeu pela dica, hein!",
+    "Errou feio. A rodada é minha."
+  ],
+  erro: [
+    "Como assim?!",
+    "Sorte de principiante...",
+    "Não acredito nisso!",
+    "Calma, ainda tô aquecendo."
+  ]
 };
 
-let audioCtx = null;
-let padGain = null;
-let particulas = [];
-let animacaoConfetti = null;
+const FALAS_VOCE = {
+  acerto: ["Achei o par!", "Memória de aço!", "Na mosca!", "Fácil demais!", "Mais um par!"],
+  erro: ["Foi mal...", "Quase!", "Errei o par.", "Foi só um deslize."],
+  pronto: ["Bora! Presta atenção.", "Agora é minha vez.", "Tô pronto. Vira as cartas.", "Foco total."]
+};
 
-function carregarNum(chave) {
+const $ = function (id) { return document.getElementById(id); };
+const paresEl = $("pares"), errosEl = $("erros"), rodadaEl = $("rodada"), comboEl = $("combo"), tempoEl = $("tempo");
+const falaVoce = $("fala-voce"), falaRival = $("fala-rival");
+const tabuleiro = $("tabuleiro"), acertoFlash = $("acerto-flash"), narracaoEl = $("narracao");
+const btnEstudo = $("btn-estudo"), btnSom = $("btn-som"), btnReiniciar = $("btn-reiniciar");
+const overlay = $("overlay"), overlayTitulo = $("overlay-titulo"), overlayTexto = $("overlay-texto"), overlayStats = $("overlay-stats");
+const btnIniciar = $("btn-iniciar"), btnEstudoOverlay = $("btn-estudo-overlay");
+const modal = $("modal-estudo"), btnFecharEstudo = $("btn-fechar-estudo"), buscaEl = $("busca-estudo"), estudoLista = $("estudo-lista");
+
+function carregarNumOuNulo(chave) {
   try {
-    const valor = Number(localStorage.getItem(chave) || 0);
-    return Number.isFinite(valor) ? valor : 0;
-  } catch (e) { return 0; }
+    const bruto = localStorage.getItem(chave);
+    if (bruto === null) return null;
+    const valor = Number(bruto);
+    return Number.isFinite(valor) ? valor : null;
+  } catch (e) { return null; }
 }
 
 function salvarNum(chave, valor) {
@@ -106,24 +81,44 @@ function carregarSom() {
   } catch (e) { return true; }
 }
 
+const jogo = {
+  ativo: false,
+  bloqueado: false,
+  paresPool: [],
+  rodadaAtual: 0,
+  cartas: [],
+  viradas: [],
+  paresTotal: 0,
+  erros: 0,
+  combo: 0,
+  inicio: 0,
+  tempoTimer: null,
+  recordeErros: carregarNumOuNulo(CHAVE_RECORDE_ERROS),
+  recordeTempo: carregarNumOuNulo(CHAVE_RECORDE_TEMPO),
+  som: carregarSom()
+};
+
+let audioCtx = null;
+let avancarTimer = null;
+let flashTimer = null;
+
 function embaralhar(lista) {
-  const copia = lista.slice();
-  for (let i = copia.length - 1; i > 0; i--) {
+  const c = lista.slice();
+  for (let i = c.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    const tmp = copia[i];
-    copia[i] = copia[j];
-    copia[j] = tmp;
+    const t = c[i]; c[i] = c[j]; c[j] = t;
   }
-  return copia;
+  return c;
 }
+
+function escolher(lista) { return lista[Math.floor(Math.random() * lista.length)]; }
 
 function formatarTempo(ms) {
   const total = Math.floor(ms / 1000);
-  const min = String(Math.floor(total / 60)).padStart(2, "0");
-  const seg = String(total % 60).padStart(2, "0");
-  return min + ":" + seg;
+  return String(Math.floor(total / 60)).padStart(2, "0") + ":" + String(total % 60).padStart(2, "0");
 }
 
+/* ---------- Som ---------- */
 function obterAudio() {
   if (!audioCtx) {
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -134,7 +129,7 @@ function obterAudio() {
   return audioCtx;
 }
 
-function tom(freq, duracao, tipo, volume, atraso) {
+function tom(freq, duracao, tipo, volume, atraso, freqFim) {
   if (!jogo.som) return;
   const a = obterAudio();
   if (!a) return;
@@ -144,6 +139,7 @@ function tom(freq, duracao, tipo, volume, atraso) {
   const ganho = a.createGain();
   osc.type = tipo || "sine";
   osc.frequency.setValueAtTime(freq, t0);
+  if (freqFim) osc.frequency.exponentialRampToValueAtTime(freqFim, t0 + dur);
   ganho.gain.setValueAtTime(0.0001, t0);
   ganho.gain.exponentialRampToValueAtTime(volume || 0.06, t0 + 0.012);
   ganho.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
@@ -153,289 +149,197 @@ function tom(freq, duracao, tipo, volume, atraso) {
   osc.stop(t0 + dur + 0.03);
 }
 
-function tomVar(freqIni, freqFim, duracao, tipo, volume, atraso) {
-  if (!jogo.som) return;
-  const a = obterAudio();
-  if (!a) return;
-  const t0 = a.currentTime + (atraso || 0);
-  const dur = duracao || 0.2;
-  const osc = a.createOscillator();
-  const ganho = a.createGain();
-  osc.type = tipo || "sine";
-  osc.frequency.setValueAtTime(freqIni, t0);
-  osc.frequency.exponentialRampToValueAtTime(freqFim, t0 + dur);
-  ganho.gain.setValueAtTime(0.0001, t0);
-  ganho.gain.exponentialRampToValueAtTime(volume || 0.06, t0 + 0.015);
-  ganho.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-  osc.connect(ganho);
-  ganho.connect(a.destination);
-  osc.start(t0);
-  osc.stop(t0 + dur + 0.03);
+function sequencia(freqs, dur, tipo, vol, passo) {
+  freqs.forEach(function (f, i) { tom(f, dur, tipo, vol, i * passo); });
 }
 
-function somClique() { tom(1250, 0.03, "square", 0.028); }
-function somHover() { tom(700, 0.025, "sine", 0.018); }
-
-function somAcerto() {
-  const base = 700 + Math.min(jogo.combo, 6) * 70;
-  tom(base, 0.09, "triangle", 0.07);
-  tom(base * 1.5, 0.16, "triangle", 0.055, 0.06);
-}
-
-function somInstalar() {
-  tom(150, 0.12, "sine", 0.06);
-  tom(95, 0.18, "triangle", 0.045, 0.03);
-}
-
+function somVirar() { tom(540, 0.04, "square", 0.022); }
+function somHover() { tom(720, 0.025, "sine", 0.016); }
+function somInicio() { sequencia([523, 784], 0.16, "triangle", 0.05, 0.1); }
+function somRodada() { sequencia([523, 659, 784], 0.14, "triangle", 0.05, 0.08); }
+function somAcerto() { sequencia([523, 659, 784, 1047], 0.18, "triangle", 0.06, 0.08); }
 function somErro() {
-  tomVar(190, 65, 0.3, "sawtooth", 0.055);
-  tomVar(95, 45, 0.32, "square", 0.03, 0.02);
+  tom(320, 0.3, "sawtooth", 0.045, 0, 80);
+  tom(150, 0.32, "square", 0.025, 0.02, 55);
 }
+function somFim() { sequencia([392, 330, 262, 196], 0.24, "sawtooth", 0.05, 0.13); }
 
-function somDica() { tomVar(420, 1100, 0.32, "sine", 0.05); }
-function somInicio() { tomVar(200, 900, 0.45, "sine", 0.055); }
-
-function somNivel() {
-  [523, 659, 784, 1047].forEach(function (f, i) {
-    tom(f, 0.15, "triangle", 0.055, i * 0.08);
-  });
-}
-
-function somVitoria() {
-  [523, 659, 784, 1047, 1319].forEach(function (f, i) {
-    tom(f, 0.28, "triangle", 0.065, i * 0.12);
-  });
-}
-
-function somFim() {
-  [392, 330, 262, 196].forEach(function (f, i) {
-    tom(f, 0.24, "sawtooth", 0.05, i * 0.13);
-  });
-  tomVar(130, 40, 0.9, "sine", 0.045, 0.12);
-}
-
-function iniciarAmbiente() {
-  const a = obterAudio();
-  if (!a) return;
-  if (!padGain) {
-    padGain = a.createGain();
-    padGain.gain.value = 0;
-    const filtro = a.createBiquadFilter();
-    filtro.type = "lowpass";
-    filtro.frequency.value = 520;
-    const p1 = a.createOscillator();
-    p1.type = "sine";
-    p1.frequency.value = 55;
-    const p2 = a.createOscillator();
-    p2.type = "triangle";
-    p2.frequency.value = 82.5;
-    p1.connect(filtro);
-    p2.connect(filtro);
-    filtro.connect(padGain);
-    padGain.connect(a.destination);
-    p1.start();
-    p2.start();
-  }
-  padGain.gain.setTargetAtTime(jogo.som ? 0.022 : 0, a.currentTime, 0.3);
-}
-
-function pararAmbiente() {
-  if (!audioCtx || !padGain) return;
-  padGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.25);
-}
-
+/* ---------- Interface ---------- */
 function atualizarBotaoSom() {
   btnSom.textContent = jogo.som ? "SOM: LIGADO" : "SOM: DESLIGADO";
   btnSom.setAttribute("aria-pressed", String(jogo.som));
 }
 
-function renderIntegridade() {
-  elIntegridade.innerHTML = "";
-  for (let i = 0; i < MAX_INTEGRIDADE; i++) {
-    const nucleo = document.createElement("span");
-    nucleo.className = "nucleo" + (i < jogo.integridade ? " cheio" : "");
-    elIntegridade.appendChild(nucleo);
-  }
-}
-
 function atualizarHUD() {
-  elModulos.textContent = jogo.resolvidas + "/" + PALAVRAS.length;
-  elPontos.textContent = jogo.pontos;
-  elCombo.textContent = "x" + Math.max(1, jogo.combo);
-  elRecorde.textContent = jogo.recorde;
-  renderIntegridade();
+  paresEl.textContent = jogo.paresTotal + "/" + TOTAL;
+  errosEl.textContent = jogo.erros;
+  rodadaEl.textContent = "RODADA " + Math.max(1, Math.min(jogo.rodadaAtual, RODADAS)) + "/" + RODADAS;
+  comboEl.textContent = "SEQUÊNCIA x" + jogo.combo;
 }
 
-function definirStatus(texto, classe) {
-  elStatus.textContent = texto;
-  elStatus.className = "status-linha" + (classe ? " " + classe : "");
+function falar(quem, texto) { (quem === "voce" ? falaVoce : falaRival).textContent = texto; }
+function narracao(texto) { narracaoEl.textContent = texto; }
+
+function mostrarFlashAcerto() {
+  acertoFlash.classList.remove("mostrar");
+  void acertoFlash.offsetWidth;
+  acertoFlash.classList.add("mostrar");
+  if (flashTimer) clearTimeout(flashTimer);
+  flashTimer = setTimeout(function () { acertoFlash.classList.remove("mostrar"); }, 950);
 }
 
-function tremerConsole() {
-  consoleEl.classList.remove("tremer");
-  void consoleEl.offsetWidth;
-  consoleEl.classList.add("tremer");
-}
+function criarCarta(carta, posicao) {
+  const el = document.createElement("div");
+  el.className = "carta";
+  el.setAttribute("role", "button");
+  el.setAttribute("tabindex", "0");
+  el.setAttribute("aria-label", "Carta virada para baixo");
 
-function gerarOpcoes(correto) {
-  const opcoes = [correto];
-  while (opcoes.length < 4) {
-    const r = Math.floor(Math.random() * PALAVRAS.length);
-    if (opcoes.indexOf(r) === -1) opcoes.push(r);
-  }
-  return embaralhar(opcoes);
-}
+  const inner = document.createElement("div");
+  inner.className = "carta-inner";
 
-function renderModulos() {
-  grade.innerHTML = "";
-  jogo.opcoes.forEach(function (indicePalavra, posicao) {
-    const modulo = document.createElement("div");
-    modulo.className = "modulo";
-    modulo.textContent = PALAVRAS[indicePalavra].resposta;
-    modulo.setAttribute("role", "button");
-    modulo.setAttribute("tabindex", "0");
-    modulo.addEventListener("click", function () { selecionar(posicao); });
-    modulo.addEventListener("keydown", function (e) {
-      if (e.code === "Enter" || e.code === "Space") {
-        e.preventDefault();
-        selecionar(posicao);
-      }
-    });
-    grade.appendChild(modulo);
+  const verso = document.createElement("div");
+  verso.className = "carta-face carta-verso";
+  const icone = document.createElement("span");
+  icone.className = "verso-icone";
+  const marca = document.createElement("span");
+  marca.className = "verso-texto";
+  marca.textContent = "NÚCLEO ZERO";
+  verso.appendChild(icone);
+  verso.appendChild(marca);
+
+  const frente = document.createElement("div");
+  frente.className = "carta-face carta-frente " + carta.tipo;
+  const conteudo = document.createElement(carta.tipo === "termo" ? "strong" : "p");
+  conteudo.className = carta.tipo === "termo" ? "carta-termo" : "carta-pista";
+  conteudo.textContent = carta.texto;
+  frente.appendChild(conteudo);
+
+  inner.appendChild(verso);
+  inner.appendChild(frente);
+  el.appendChild(inner);
+
+  el.addEventListener("click", function () { virarCarta(posicao); });
+  el.addEventListener("keydown", function (e) {
+    if (e.code === "Enter" || e.code === "Space") {
+      e.preventDefault();
+      virarCarta(posicao);
+    }
   });
-  jogo.corretaPos = jogo.opcoes.indexOf(jogo.atual);
+  return el;
 }
 
-function mostrarGanho(elemento, texto) {
-  const span = document.createElement("span");
-  span.className = "ganho";
-  span.textContent = texto;
-  elemento.appendChild(span);
-  setTimeout(function () {
-    if (span.parentNode) span.parentNode.removeChild(span);
-  }, 950);
+function renderTabuleiro() {
+  tabuleiro.innerHTML = "";
+  jogo.cartas.forEach(function (carta, posicao) {
+    tabuleiro.appendChild(criarCarta(carta, posicao));
+  });
 }
 
-function carregarRodada() {
+/* ---------- Lógica ---------- */
+function virarCarta(posicao) {
+  if (!jogo.ativo || jogo.bloqueado) return;
+  const carta = jogo.cartas[posicao];
+  if (!carta || carta.encontrada) return;
+
+  const el = tabuleiro.children[posicao];
+  if (!el || el.classList.contains("virada") || el.classList.contains("par")) return;
+
+  el.classList.add("virada");
+  el.setAttribute("aria-label", (carta.tipo === "termo" ? "Termo: " : "Pista: ") + carta.texto);
+  jogo.viradas.push(posicao);
+  somVirar();
+
+  if (jogo.viradas.length === 2) verificarPar();
+}
+
+function verificarPar() {
+  const posA = jogo.viradas[0];
+  const posB = jogo.viradas[1];
+  const cartaA = jogo.cartas[posA];
+  const cartaB = jogo.cartas[posB];
+  const elA = tabuleiro.children[posA];
+  const elB = tabuleiro.children[posB];
+
+  if (cartaA.parId === cartaB.parId) {
+    cartaA.encontrada = true;
+    cartaB.encontrada = true;
+    elA.classList.add("par");
+    elB.classList.add("par");
+    jogo.viradas = [];
+    jogo.paresTotal++;
+    jogo.combo++;
+
+    falar("voce", escolher(FALAS_VOCE.acerto));
+    falar("rival", escolher(FALAS_RIVAL.erro));
+    somAcerto();
+    mostrarFlashAcerto();
+    narracao("Par encontrado: " + PALAVRAS[cartaA.parId].resposta + "!");
+    atualizarHUD();
+
+    if (jogo.cartas.every(function (c) { return c.encontrada; })) {
+      jogo.bloqueado = true;
+      avancarTimer = setTimeout(proximaRodada, 1500);
+    }
+  } else {
+    jogo.bloqueado = true;
+    jogo.erros++;
+    jogo.combo = 0;
+    elA.classList.add("errada");
+    elB.classList.add("errada");
+
+    falar("rival", escolher(FALAS_RIVAL.falha));
+    falar("voce", escolher(FALAS_VOCE.erro));
+    somErro();
+    narracao("Não é esse par. Tente de novo.");
+    atualizarHUD();
+
+    avancarTimer = setTimeout(function () {
+      [elA, elB].forEach(function (el) {
+        el.classList.remove("virada", "errada");
+        el.setAttribute("aria-label", "Carta virada para baixo");
+      });
+      jogo.viradas = [];
+      jogo.bloqueado = false;
+      avancarTimer = null;
+    }, 1000);
+  }
+}
+
+function proximaRodada() {
+  avancarTimer = null;
   if (!jogo.ativo) return;
 
-  if (jogo.fila.length === 0) {
-    vitoria();
+  if (jogo.paresPool.length === 0) {
+    finalizarJogo();
     return;
   }
 
-  const nivelAnterior = jogo.nivel;
-  jogo.nivel = Math.floor(jogo.resolvidas / MODULOS_POR_NIVEL) + 1;
-  const subiuNivel = jogo.nivel > nivelAnterior;
+  jogo.rodadaAtual++;
+  const lote = jogo.paresPool.splice(0, PARES_POR_RODADA);
+  const cartas = [];
+  lote.forEach(function (id) {
+    cartas.push({ parId: id, tipo: "termo", texto: PALAVRAS[id].resposta, encontrada: false });
+    cartas.push({ parId: id, tipo: "pista", texto: PALAVRAS[id].pista, encontrada: false });
+  });
 
-  if (subiuNivel) {
-    jogo.integridade = Math.min(MAX_INTEGRIDADE, jogo.integridade + 1);
-    somNivel();
-  }
-
-  jogo.atual = jogo.fila.shift();
-  jogo.opcoes = gerarOpcoes(jogo.atual);
-  jogo.dicaUsada = false;
+  jogo.cartas = embaralhar(cartas);
+  jogo.viradas = [];
   jogo.bloqueado = false;
+  renderTabuleiro();
 
-  const palavra = PALAVRAS[jogo.atual];
-  elPista.textContent = palavra.pista;
-  elTamanho.textContent = "(" + palavra.resposta.length + " letras)";
-  elNumSinal.textContent = jogo.resolvidas + 1;
-
-  renderModulos();
+  falar("rival", escolher(FALAS_RIVAL.provocar));
+  falar("voce", escolher(FALAS_VOCE.pronto));
+  narracao("Rodada " + jogo.rodadaAtual + " de " + RODADAS + ". Encontre os " + lote.length + " pares.");
   atualizarHUD();
-
-  btnDica.disabled = false;
-
-  if (subiuNivel) {
-    definirStatus("NÍVEL " + jogo.nivel + " — INTEGRIDADE +1", "destaque");
-  } else {
-    definirStatus("CLIQUE NO TERMO CORRETO", "");
-  }
-}
-
-function selecionar(posicao) {
-  if (!jogo.ativo || jogo.bloqueado) return;
-
-  jogo.bloqueado = true;
-  somClique();
-
-  const modulos = grade.children;
-  const escolhido = modulos[posicao];
-  if (!escolhido) {
-    jogo.bloqueado = false;
-    return;
-  }
-  const acertou = posicao === jogo.corretaPos;
-
-  if (acertou) {
-    jogo.combo++;
-    const multiplicador = Math.min(1 + jogo.combo * 0.2, 5);
-    const ganho = Math.round(100 * multiplicador);
-    jogo.pontos += ganho;
-    jogo.resolvidas++;
-
-    escolhido.classList.add("certa");
-    mostrarGanho(escolhido, "+" + ganho);
-
-    somAcerto();
-    somInstalar();
-    definirStatus("MÓDULO RESTAURADO", "ok");
-    atualizarHUD();
-
-    btnDica.disabled = true;
-
-    setTimeout(function () {
-      if (jogo.ativo) carregarRodada();
-    }, 720);
-  } else {
-    jogo.combo = 0;
-    jogo.integridade--;
-
-    escolhido.classList.add("errada");
-    somErro();
-    tremerConsole();
-    atualizarHUD();
-
-    if (jogo.integridade <= 0) {
-      fimDeJogo();
-      return;
-    }
-
-    definirStatus("RUÍDO — INTEGRIDADE -1", "ruim");
-
-    setTimeout(function () {
-      if (!jogo.ativo) return;
-      escolhido.classList.remove("errada");
-      jogo.bloqueado = false;
-    }, 560);
-  }
-}
-
-function usarDica() {
-  if (!jogo.ativo || jogo.bloqueado || jogo.dicaUsada) return;
-
-  jogo.dicaUsada = true;
-  jogo.pontos = Math.max(0, jogo.pontos - CUSTO_DICA);
-
-  const alvo = grade.children[jogo.corretaPos];
-  if (alvo) {
-    alvo.classList.add("revelado");
-    setTimeout(function () { alvo.classList.remove("revelado"); }, 1600);
-  }
-
-  somDica();
-  atualizarHUD();
-  btnDica.disabled = true;
-  definirStatus("DICA REVELADA (-" + CUSTO_DICA + ")", "destaque");
+  somRodada();
 }
 
 function iniciarTempo() {
   pararTempo();
-  elTempo.textContent = "00:00";
+  tempoEl.textContent = "00:00";
   jogo.tempoTimer = setInterval(function () {
-    elTempo.textContent = formatarTempo(Date.now() - jogo.inicio);
+    tempoEl.textContent = formatarTempo(Date.now() - jogo.inicio);
   }, 250);
 }
 
@@ -446,199 +350,162 @@ function pararTempo() {
   }
 }
 
+function limparTimers() {
+  if (avancarTimer) { clearTimeout(avancarTimer); avancarTimer = null; }
+  if (flashTimer) { clearTimeout(flashTimer); flashTimer = null; }
+  pararTempo();
+}
+
 function iniciarJogo() {
-  if (jogo.ativo) return;
+  limparTimers();
 
   jogo.ativo = true;
-  jogo.pontos = 0;
-  jogo.combo = 0;
-  jogo.integridade = INTEGRIDADE_INICIAL;
-  jogo.nivel = 1;
-  jogo.resolvidas = 0;
-  jogo.fila = embaralhar(PALAVRAS.map(function (_, i) { return i; }));
-  jogo.atual = null;
-  jogo.opcoes = [];
   jogo.bloqueado = false;
-  jogo.dicaUsada = false;
-  jogo.novoRecorde = false;
+  jogo.paresPool = embaralhar(PALAVRAS.map(function (_, i) { return i; }));
+  jogo.rodadaAtual = 0;
+  jogo.cartas = [];
+  jogo.viradas = [];
+  jogo.paresTotal = 0;
+  jogo.erros = 0;
+  jogo.combo = 0;
   jogo.inicio = Date.now();
 
-  overlay.classList.remove("visivel");
-  pararConfetti();
-  iniciarAmbiente();
-  somInicio();
+  tabuleiro.innerHTML = "";
+  acertoFlash.classList.remove("mostrar");
+  esconderOverlay();
   iniciarTempo();
-
-  carregarRodada();
-  atualizarHUD();
+  somInicio();
+  proximaRodada();
 }
 
-function vitoria() {
-  if (!jogo.ativo) return;
-  jogo.pontos += BONUS_VITORIA;
-  finalizar(true);
-}
-
-function fimDeJogo() {
-  if (!jogo.ativo) return;
-  finalizar(false);
-}
-
-function finalizar(venceu) {
+function finalizarJogo() {
   jogo.ativo = false;
-  pararTempo();
-  pararAmbiente();
-
-  btnDica.disabled = true;
+  jogo.bloqueado = true;
+  limparTimers();
+  atualizarHUD();
 
   const tempoMs = Date.now() - jogo.inicio;
-  elTempo.textContent = formatarTempo(tempoMs);
+  const novoRecorde = jogo.recordeErros === null || jogo.erros < jogo.recordeErros ||
+    (jogo.erros === jogo.recordeErros && (jogo.recordeTempo === null || tempoMs < jogo.recordeTempo));
 
-  if (jogo.pontos > jogo.recorde) {
-    jogo.recorde = jogo.pontos;
-    jogo.novoRecorde = true;
-    salvarNum(CHAVE_RECORDE, jogo.recorde);
-  } else {
-    jogo.novoRecorde = false;
+  if (novoRecorde) {
+    jogo.recordeErros = jogo.erros;
+    jogo.recordeTempo = tempoMs;
+    salvarNum(CHAVE_RECORDE_ERROS, jogo.recordeErros);
+    salvarNum(CHAVE_RECORDE_TEMPO, jogo.recordeTempo);
   }
 
-  atualizarHUD();
+  let titulo;
+  if (jogo.erros <= 4) { titulo = "VITÓRIA!"; somAcerto(); }
+  else if (jogo.erros <= 10) { titulo = "BOM JOGO"; somFim(); }
+  else { titulo = "TREINE MAIS"; somFim(); }
 
-  if (venceu) {
-    somVitoria();
-    dispararConfetti();
-    definirStatus("NÚCLEO RESTAURADO", "ok");
-    mostrarOverlay(
-      "NÚCLEO RESTAURADO",
-      "Você decodificou os 16 módulos em " + formatarTempo(tempoMs) + "." + (jogo.novoRecorde ? " Novo recorde!" : ""),
-      [["Pontos", jogo.pontos], ["Tempo", formatarTempo(tempoMs)], ["Recorde", jogo.recorde]],
-      "JOGAR NOVAMENTE"
-    );
-  } else {
-    somFim();
-    definirStatus("COLAPSO DO NÚCLEO", "ruim");
-    mostrarOverlay(
-      "COLAPSO DO NÚCLEO",
-      "Você restaurou " + jogo.resolvidas + " de 16 módulos." + (jogo.novoRecorde ? " Novo recorde!" : " Tente novamente!"),
-      [["Módulos", jogo.resolvidas + "/16"], ["Pontos", jogo.pontos], ["Recorde", jogo.recorde]],
-      "TENTAR NOVAMENTE"
-    );
-  }
+  const texto = "Você encontrou os " + TOTAL + " pares com " + jogo.erros +
+    (jogo.erros === 1 ? " erro." : " erros.") + (novoRecorde ? " Novo recorde!" : "");
+
+  mostrarOverlay(titulo, texto, [
+    ["Pares", jogo.paresTotal + "/" + TOTAL],
+    ["Erros", jogo.erros],
+    ["Tempo", formatarTempo(tempoMs)],
+    ["Recorde", jogo.recordeErros === null ? "—" : jogo.recordeErros + " erros"]
+  ], "JOGAR DE NOVO", "REVISAR CONTEÚDO");
 }
 
-function mostrarOverlay(titulo, texto, stats, rotuloBotao) {
+/* ---------- Overlay e modo estudo ---------- */
+function mostrarOverlay(titulo, texto, stats, rotuloPrincipal, rotuloSecundario) {
   overlayTitulo.textContent = titulo;
   overlayTexto.textContent = texto;
-  overlayStats.innerHTML = stats.map(function (par) {
-    return '<div class="ov-stat"><span>' + par[0] + "</span><strong>" + par[1] + "</strong></div>";
-  }).join("");
-  btnIniciar.textContent = rotuloBotao;
+  overlayStats.innerHTML = "";
+  stats.forEach(function (par) {
+    const caixa = document.createElement("div");
+    caixa.className = "ov-stat";
+    const rotulo = document.createElement("span");
+    rotulo.textContent = par[0];
+    const valor = document.createElement("strong");
+    valor.textContent = par[1];
+    caixa.appendChild(rotulo);
+    caixa.appendChild(valor);
+    overlayStats.appendChild(caixa);
+  });
+  btnIniciar.textContent = rotuloPrincipal;
+  btnEstudoOverlay.textContent = rotuloSecundario || "MODO ESTUDO";
   overlay.classList.add("visivel");
   btnIniciar.focus();
 }
 
-function ajustarCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
+function esconderOverlay() { overlay.classList.remove("visivel"); }
 
-const CORES_CONFETTI = ["#3dffb0", "#26e0ff", "#ffd166", "#ff3d8b", "#a78bfa"];
+function renderEstudo(filtro) {
+  const termo = (filtro || "").trim().toLowerCase();
+  estudoLista.innerHTML = "";
+  let encontrados = 0;
 
-function dispararConfetti() {
-  ajustarCanvas();
-  particulas = [];
-  for (let i = 0; i < 170; i++) {
-    particulas.push({
-      x: canvas.width / 2 + (Math.random() - 0.5) * canvas.width * 0.6,
-      y: canvas.height * 0.3 + (Math.random() - 0.5) * 90,
-      vx: (Math.random() - 0.5) * 11,
-      vy: Math.random() * -10 - 3,
-      tam: Math.random() * 8 + 4,
-      rot: Math.random() * Math.PI,
-      vr: (Math.random() - 0.5) * 0.3,
-      cor: CORES_CONFETTI[Math.floor(Math.random() * CORES_CONFETTI.length)],
-      vida: 1
-    });
-  }
-  cancelAnimationFrame(animacaoConfetti);
-  animarConfetti();
-}
+  PALAVRAS.forEach(function (palavra, indice) {
+    if (termo && (palavra.resposta + " " + palavra.pista).toLowerCase().indexOf(termo) === -1) return;
+    encontrados++;
+    const card = document.createElement("div");
+    card.className = "estudo-card";
+    const titulo = document.createElement("strong");
+    titulo.textContent = (indice + 1) + ". " + palavra.resposta;
+    const pista = document.createElement("p");
+    pista.textContent = "Pista: " + palavra.pista;
+    card.appendChild(titulo);
+    card.appendChild(pista);
+    estudoLista.appendChild(card);
+  });
 
-function animarConfetti() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  let ativos = 0;
-
-  for (let i = 0; i < particulas.length; i++) {
-    const p = particulas[i];
-    p.vy += 0.28;
-    p.vx *= 0.995;
-    p.x += p.vx;
-    p.y += p.vy;
-    p.rot += p.vr;
-    if (p.y > canvas.height + 30) p.vida = 0;
-
-    if (p.vida > 0) {
-      ativos++;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.fillStyle = p.cor;
-      ctx.globalAlpha = 0.9;
-      ctx.fillRect(-p.tam / 2, -p.tam / 4, p.tam, p.tam / 2);
-      ctx.restore();
-    }
-  }
-
-  if (ativos > 0) {
-    animacaoConfetti = requestAnimationFrame(animarConfetti);
-  } else {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!encontrados) {
+    const vazio = document.createElement("p");
+    vazio.className = "estudo-vazio";
+    vazio.textContent = "Nenhum termo encontrado.";
+    estudoLista.appendChild(vazio);
   }
 }
 
-function pararConfetti() {
-  cancelAnimationFrame(animacaoConfetti);
-  particulas = [];
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function abrirEstudo() {
+  renderEstudo(buscaEl.value);
+  modal.classList.add("aberto");
+  modal.setAttribute("aria-hidden", "false");
+  buscaEl.focus();
 }
 
-btnDica.addEventListener("click", usarDica);
+function fecharEstudo() {
+  modal.classList.remove("aberto");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+/* ---------- Eventos ---------- */
 btnIniciar.addEventListener("click", iniciarJogo);
-
-window.addEventListener("keydown", function (e) {
-  if (e.repeat || !jogo.ativo || jogo.bloqueado) return;
-  const indice = ["Digit1", "Digit2", "Digit3", "Digit4"].indexOf(e.code);
-  if (indice !== -1) {
-    e.preventDefault();
-    selecionar(indice);
-  }
-});
+btnEstudoOverlay.addEventListener("click", abrirEstudo);
+btnEstudo.addEventListener("click", abrirEstudo);
+btnFecharEstudo.addEventListener("click", fecharEstudo);
+btnReiniciar.addEventListener("click", iniciarJogo);
+buscaEl.addEventListener("input", function () { renderEstudo(buscaEl.value); });
+modal.addEventListener("click", function (e) { if (e.target === modal) fecharEstudo(); });
 
 btnSom.addEventListener("click", function () {
   jogo.som = !jogo.som;
   salvarNum(CHAVE_SOM, jogo.som ? 1 : 0);
   atualizarBotaoSom();
-  if (jogo.som) {
-    obterAudio();
-    tom(880, 0.08, "triangle", 0.05);
-    if (jogo.ativo) iniciarAmbiente();
-  } else {
-    pararAmbiente();
-  }
+  if (jogo.som) tom(880, 0.08, "triangle", 0.05);
 });
 
-[btnDica, btnIniciar, btnSom].forEach(function (botao) {
-  botao.addEventListener("mouseenter", somHover);
+[btnIniciar, btnEstudoOverlay, btnEstudo, btnSom, btnReiniciar].forEach(function (b) {
+  b.addEventListener("mouseenter", somHover);
 });
 
-window.addEventListener("resize", ajustarCanvas);
+window.addEventListener("keydown", function (e) {
+  if (e.code === "Escape") fecharEstudo();
+});
 
+/* ---------- Início ---------- */
 atualizarBotaoSom();
 atualizarHUD();
-ajustarCanvas();
+renderEstudo("");
 mostrarOverlay(
   "NÚCLEO ZERO",
-  "Uma pista aparece no terminal e quatro módulos disputam a resposta. Clique no termo que corresponde à pista. Sem cronômetro: pense com calma. Cada erro custa integridade.",
-  [["Recorde", jogo.recorde]],
-  "INICIAR TRANSMISSÃO"
+  "Um jogo da memória com o conteúdo de arquitetura de computadores: cada termo tem a sua pista. Vire duas cartas por vez e encontre os pares. São " + TOTAL + " pares em " + RODADAS + " rodadas. Use o MODO ESTUDO para revisar.",
+  [["Recorde", jogo.recordeErros === null ? "—" : jogo.recordeErros + " erros"], ["Pares", TOTAL]],
+  "INICIAR JOGO",
+  "ESTUDAR PRIMEIRO"
 );
