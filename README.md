@@ -2,15 +2,6 @@
 
 Jogo de navegador sobre arquitetura de computadores. Uma pista aparece no terminal, quatro módulos disputam a resposta e um scanner salta entre eles. Você precisa travar o scanner no termo correto antes que o tempo acabe.
 
-Esta é a **versão original** do projeto, dividida em três arquivos.
-
-## Como rodar
-
-1. Deixe os três arquivos na mesma pasta: `index.html`, `style.css` e `script.js`.
-2. Abra o `index.html` em qualquer navegador moderno.
-
-Não há dependências nem build. As fontes **Orbitron** e **Space Grotesk** vêm do Google Fonts. Sem internet, o jogo usa as fontes de sistema como alternativa.
-
 ## Estrutura
 
 | Arquivo | Função |
